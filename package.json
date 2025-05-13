@@ -32,6 +32,7 @@
     "expo-system-ui": "~5.0.7",
     "expo-video": "~2.1.8",
     "expo-web-browser": "~14.1.6",
+    "markdown-it": "^14.1.0",
     "nostr-tools": "1.14",
     "react": "19.0.0",
     "react-dom": "19.0.0",
