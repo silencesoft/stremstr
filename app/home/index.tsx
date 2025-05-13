@@ -105,9 +105,18 @@ export default function HomeScreen() {
             })
             .map(({ event, user }) => {
               const urls = extractMediaUrls(event.content || "");
-              const lines = event.content.split("\n");
-              const title = lines[0]?.slice(0, 100);
-              const description = lines.slice(1).join("\n");
+              const filteredLines = event.content
+                .split("\n")
+                .filter(
+                  (line) =>
+                    !line.includes(".jpg") &&
+                    !line.includes(".png") &&
+                    !line.includes(".mp4") &&
+                    !/https?:\/\/(www\.)?(youtube\.com|youtu\.be)\//.test(line)
+                );
+
+              const title = filteredLines[0]?.slice(0, 100);
+              const description = filteredLines.slice(1).join("\n");
 
               return {
                 id: event.id,

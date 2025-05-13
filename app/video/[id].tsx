@@ -1,16 +1,18 @@
-import { useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { usePostStore } from "@/stores/usePostStore";
 import { useEvent } from "expo";
 import { useNavigation, useFocusEffect } from "expo-router";
+import Video from "@/components/Video";
 
 export default function VideoScreen() {
   const { id } = useLocalSearchParams();
   const post = usePostStore((state) => state.getPostById(id as string));
   const videoSource = post?.video;
   const navigation = useNavigation();
+  const [playing, setPlaying] = useState(true);
 
   const player = useVideoPlayer(videoSource || "", (p) => {
     p.loop = false;
@@ -20,6 +22,8 @@ export default function VideoScreen() {
   const { isPlaying } = useEvent(player, "playingChange", {
     isPlaying: player.playing,
   });
+
+  const isYoutube = videoSource?.includes("youtube.com/embed");
 
   const router = useRouter();
 
@@ -47,12 +51,22 @@ export default function VideoScreen() {
       >
         <Text style={styles.closeText}>✖</Text>
       </TouchableOpacity>
-      <VideoView
-        player={player}
-        style={{ flex: 1 }}
-        allowsFullscreen
-        allowsPictureInPicture
-      />
+      {isYoutube ? (
+        <Video
+          videoId={
+            videoSource?.replace("https://www.youtube.com/embed/", "") || ""
+          }
+          playing={playing}
+          setPlaying={setPlaying}
+        />
+      ) : (
+        <VideoView
+          player={player}
+          style={{ flex: 1 }}
+          allowsFullscreen
+          allowsPictureInPicture
+        />
+      )}
     </View>
   );
 }
