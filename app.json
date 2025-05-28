@@ -1,20 +1,23 @@
 {
   "expo": {
-    "name": "stremstr",
+    "name": "Stremstr",
     "slug": "stremstr",
+    "owner": "silencesoft",
     "version": "0.2.0",
     "icon": "./assets/themes/light/icon_192_light.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "net.silencesoft.stremstr"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/themes/light/icon_512_light.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "net.silencesoft.stremstr"
     },
     "web": {
       "bundler": "metro",
@@ -48,6 +51,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b43da50f-a006-44ea-9d31-d7d24ccb1a96"
+      }
     }
   }
 }
