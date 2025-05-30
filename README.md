@@ -1,16 +1,33 @@
 # Welcome to your Stremstr 👋
 
-A simple client for nostr and #kinostr.
+Stremstr is a decentralized streaming app built on top of the Nostr protocol and #KinoStr hashtag. Watch, share, and explore video content with lightning-fast interactions and open social integration.
 
-## Get started
+## ✨ Features
 
-1. Install dependencies
+- Decentralized content discovery using Nostr
+- Lightning-powered tipping
+- Clean and modern UI optimized for mobile
+- Support for both dark and light themes
+
+## 🚀 How to Install
+
+You can install Stremstr via [Obtainium](https://github.com/ImranR98/Obtainium) or manually download the APK from the [Releases](https://github.com/silencesoft/stremstr/releases).
+
+## Get started (source code)
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/silencesoft/stremstr.git
+   ```
+
+2. Install dependencies
 
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Start the app
 
    ```bash
     npx expo start

@@ -17,7 +17,8 @@
         "foregroundImage": "./assets/themes/light/icon_512_light.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "net.silencesoft.stremstr"
+      "package": "net.silencesoft.stremstr",
+      "versionCode": 2
     },
     "web": {
       "bundler": "metro",

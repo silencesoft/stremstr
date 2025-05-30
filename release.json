@@ -1,0 +1,13 @@
+{
+  "package": "net.silencesoft.stremstr",
+  "name": "Stremstr",
+  "source": "github",
+  "github": {
+    "owner": "silencesoft",
+    "repo": "stremstr"
+  },
+  "version": {
+    "strategy": "latest_release"
+  },
+  "autoUpdate": true
+}
