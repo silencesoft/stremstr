@@ -1,0 +1,73 @@
+name: Android Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - app.json
+
+jobs:
+  release:
+    if: github.event.head_commit.message != '' && contains(github.event.head_commit.message, 'version')
+    runs-on: ubuntu-latest
+
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      VERSION: ${{ steps.extract_version.outputs.version }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Extract version from app.json
+        id: extract_version
+        run: |
+          VERSION=$(jq -r '.expo.version' app.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Install eas-cli
+        run: npm install -g eas-cli
+
+      - name: Fetch latest Android build info
+        id: get_build
+        run: |
+          BUILD=$(eas build:list --platform android --limit 1 --json)
+          AAB_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.buildUrl')
+          APK_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.applicationArchiveUrl')
+          echo "aab_url=$AAB_URL" >> "$GITHUB_OUTPUT"
+          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Download AAB & APK
+        run: |
+          mkdir -p dist
+          curl -L "${{ steps.get_build.outputs.aab_url }}" -o dist/app-release.aab
+          curl -L "${{ steps.get_build.outputs.apk_url }}" -o dist/app-release.apk
+
+      - name: Generate release.json
+        run: |
+          echo '{ "version": "'"$VERSION"'", "aab_url": "https://github.com/${{ github.repository }}/releases/download/v'"$VERSION"'/app-release.aab", "apk_url": "https://github.com/${{ github.repository }}/releases/download/v'"$VERSION"'/app-release.apk" }' > dist/release.json
+
+      - name: Generate CHANGELOG.md
+        run: |
+          echo "## Changelog for v$VERSION" > dist/CHANGELOG.md
+          echo "" >> dist/CHANGELOG.md
+          git log -1 --pretty=format:"- %s (%h)" >> dist/CHANGELOG.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: v${{ env.VERSION }}
+          body_path: dist/CHANGELOG.md
+          files: |
+            dist/app-release.aab
+            dist/app-release.apk
+            dist/release.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
