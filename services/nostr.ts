@@ -62,7 +62,7 @@ export const fetchHashtagPosts = async ({
   try {
     const filters = {
       kinds: [1],
-      "#t": [hashtag.toLowerCase()],
+      "#t": ["kinostr", hashtag.toLowerCase()],
       limit, // Ensure we send the limit for pagination
       ...(until ? { until } : {}),
     };

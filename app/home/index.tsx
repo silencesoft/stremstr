@@ -2,8 +2,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
-  TextInput,
-  FlatList,
+  AccessibilityInfo,
+  ScrollView,
   StyleSheet,
   RefreshControl,
   Image,
@@ -23,6 +23,7 @@ import {
 } from "react-native-safe-area-context";
 
 import { usePostStore } from "@/stores/usePostStore";
+import { useHashtagStore } from "@/stores/useHashtagStore";
 import { useRelayStore } from "@/stores/useRelayStore";
 import { connectToRelays, fetchHashtagPosts } from "@/services/nostr";
 import { extractMediaUrls } from "@/utils/extractMedia";
@@ -38,7 +39,7 @@ export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
-  const [hashtag, setHashtag] = useState("kinostr");
+  const [hashtag, setHashtag] = useState("");
   const [isZapVisible, setIsZapVisible] = useState(false);
   const [invoice, setInvoice] = useState("");
   const [since, setSince] = useState<number | undefined>(undefined);
@@ -73,6 +74,8 @@ export default function HomeScreen() {
     setError,
   } = usePostStore();
 
+  const { hashtags, addHashtags, resetHashtags } = useHashtagStore();
+
   const loadPosts = useCallback(
     async (loadMore = false) => {
       if (loadMore && loadingMore) return;
@@ -97,6 +100,8 @@ export default function HomeScreen() {
           until: since,
         });
 
+        const allHashtags = new Set<string>();
+
         if (result.length > 0) {
           const validPosts = result
             .filter(({ event }) => {
@@ -104,6 +109,11 @@ export default function HomeScreen() {
               return urls.image && urls.video;
             })
             .map(({ event, user }) => {
+              const hashtags = [...(event.content.match(/#\w+/g) || [])].map(
+                (h) => h.replace("#", "").toLowerCase()
+              );
+              hashtags.forEach((tag) => allHashtags.add(tag));
+
               const urls = extractMediaUrls(event.content || "");
               const filteredLines = event.content
                 .split("\n")
@@ -134,6 +144,8 @@ export default function HomeScreen() {
             });
 
           addPosts(validPosts);
+
+          addHashtags(Array.from(allHashtags));
 
           const oldestTimestamp = validPosts.reduce((min, post) => {
             if (post?.created_at === undefined) return min;
@@ -185,6 +197,12 @@ export default function HomeScreen() {
   );
 
   useEffect(() => {
+    if (hashtag) {
+      AccessibilityInfo.announceForAccessibility(
+        `Filtered posts by hashtag ${hashtag}`
+      );
+    }
+
     handleRefresh();
   }, [hashtag]);
 
@@ -214,6 +232,7 @@ export default function HomeScreen() {
         >
           <Text
             style={[styles.headerTitle, { color: isDark ? "#fff" : "#000" }]}
+            accessibilityRole="header"
           >
             KinoStr
           </Text>
@@ -243,7 +262,7 @@ export default function HomeScreen() {
           }}
           ListHeaderComponent={
             <>
-              <View style={styles.inputWrapper}>
+              {/* <View style={styles.inputWrapper}>
                 <TextInput
                   style={styles.input}
                   value={hashtag}
@@ -251,6 +270,69 @@ export default function HomeScreen() {
                   placeholder="Enter hashtag"
                   placeholderTextColor={isDark ? "#888" : "#aaa"}
                 />
+              </View> */}
+              <View
+                style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+              >
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={{
+                    paddingVertical: 10,
+                    gap: 8,
+                    paddingLeft: 4,
+                  }}
+                >
+                  {hashtags
+                    .filter((tag) => tag !== "kinostr")
+                    .map((tag) => (
+                      <TouchableOpacity
+                        key={tag}
+                        onPress={() => setHashtag(tag)}
+                        style={{
+                          paddingVertical: 6,
+                          paddingHorizontal: 12,
+                          borderRadius: 20,
+                          backgroundColor:
+                            hashtag === tag
+                              ? isDark
+                                ? "#444"
+                                : "#ccc"
+                              : isDark
+                              ? "#222"
+                              : "#eee",
+                          marginRight: 8,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: isDark ? "#fff" : "#000",
+                            fontWeight: hashtag === tag ? "bold" : "normal",
+                          }}
+                        >
+                          #{tag}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                </ScrollView>
+                {hashtag !== "" && (
+                  <TouchableOpacity
+                    onPress={() => setHashtag("")}
+                    accessibilityLabel="Clear hashtag filter"
+                    accessibilityRole="button"
+                    style={{
+                      padding: 6,
+                      borderRadius: 20,
+                      backgroundColor: isDark ? "#333" : "#ddd",
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="close-circle-outline"
+                      size={24}
+                      color={isDark ? "#fff" : "#000"}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
               {error && <Text style={styles.errorText}>{error}</Text>}
             </>
@@ -265,16 +347,24 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => router.push(`/home/detail?id=${item.id}`)}
+              accessibilityLabel={`View post titled ${item.title}`}
+              accessibilityRole="button"
+              accessibilityHint="Navigates to the post detail screen"
               style={styles.card}
             >
               <View style={styles.imageContainer}>
-                <Image source={{ uri: item.image }} style={styles.image} />
+                <Image
+                  source={{ uri: item.image }}
+                  style={styles.image}
+                  accessibilityLabel={`Image from post titled ${item.title}`}
+                />
                 {item.user?.avatar && item.user?.name && (
                   <View style={styles.userContainer}>
                     <Image
                       source={{ uri: item.user.avatar }}
                       style={styles.avatar}
                       defaultSource={require("../../assets/images/avatar-placeholder.png")}
+                      accessibilityLabel={`Avatar of ${item.user.name}`}
                     />
                     <Text style={styles.username}>
                       {item.user?.name ?? "Anonymous"}
@@ -297,7 +387,11 @@ export default function HomeScreen() {
                   size={20}
                   color="#444"
                 />
-                <TouchableOpacity onPress={() => handleZap(item)}>
+                <TouchableOpacity
+                  onPress={() => handleZap(item)}
+                  accessibilityLabel="Send zap payment"
+                  accessibilityRole="button"
+                >
                   <MaterialCommunityIcons
                     name="lightning-bolt-outline"
                     size={20}
