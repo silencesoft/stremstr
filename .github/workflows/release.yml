@@ -39,7 +39,7 @@ jobs:
         id: get_aab
         run: |
           echo "Fetching latest AAB build..."
-          BUILD=$(eas build:list --platform android --profile production --limit 1 --json || echo "[]")
+          BUILD=$(eas build:list --platform android --profile production --limit 1 --json --non-interactive || echo "[]")
           echo "AAB build list: $BUILD"
           echo "$BUILD" > build-aab.json
           AAB_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.buildUrl')
@@ -52,7 +52,7 @@ jobs:
         id: get_apk
         run: |
           echo "Fetching latest APK build..."
-          BUILD=$(eas build:list --platform android --profile production-apk --limit 1 --json || echo "[]")
+          BUILD=$(eas build:list --platform android --profile production-apk --limit 1 --json --non-interactive || echo "[]")
           echo "APK build list: $BUILD"
           echo "$BUILD" > build-apk.json
           APK_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.applicationArchiveUrl')

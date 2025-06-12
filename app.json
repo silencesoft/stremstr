@@ -3,7 +3,7 @@
     "name": "Stremstr",
     "slug": "stremstr",
     "owner": "silencesoft",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "icon": "./assets/themes/light/icon_192_light.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
