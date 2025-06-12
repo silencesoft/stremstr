@@ -14,6 +14,7 @@ jobs:
 
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_ACCESS_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
     steps:
       - name: Checkout repo
@@ -37,16 +38,26 @@ jobs:
       - name: Fetch latest AAB build from 'production'
         id: get_aab
         run: |
-          AAB_URL=$(eas build:list --platform android --profile production --limit 1 --json | jq -r '.[0].artifacts.buildUrl')
-          echo "aab_url=$AAB_URL" >> $GITHUB_OUTPUT
+          echo "Fetching latest AAB build..."
+          BUILD=$(eas build:list --platform android --profile production --limit 1 --json || echo "[]")
+          echo "AAB build list: $BUILD"
+          echo "$BUILD" > build-aab.json
+          AAB_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.buildUrl')
+          echo "aab_url=$AAB_URL"
+          echo "aab_url=$AAB_URL" >> "$GITHUB_OUTPUT"
         env:
           EAS_ACCESS_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Fetch latest APK build from 'production-apk'
         id: get_apk
         run: |
-          APK_URL=$(eas build:list --platform android --profile production-apk --limit 1 --json | jq -r '.[0].artifacts.applicationArchiveUrl')
-          echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
+          echo "Fetching latest APK build..."
+          BUILD=$(eas build:list --platform android --profile production-apk --limit 1 --json || echo "[]")
+          echo "APK build list: $BUILD"
+          echo "$BUILD" > build-apk.json
+          APK_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.applicationArchiveUrl')
+          echo "apk_url=$APK_URL"
+          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
         env:
           EAS_ACCESS_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
