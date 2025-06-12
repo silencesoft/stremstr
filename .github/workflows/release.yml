@@ -32,6 +32,10 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
+      - name: Install dependencies needed for config parsing
+        run: |
+          npm install
+
       - name: Install eas-cli
         run: npm install -g eas-cli
 
@@ -42,11 +46,9 @@ jobs:
           BUILD=$(eas build:list --platform android --profile production --limit 1 --json --non-interactive || echo "[]")
           echo "AAB build list: $BUILD"
           echo "$BUILD" > build-aab.json
-          AAB_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.buildUrl')
+          AAB_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.buildUrl // empty')
           echo "aab_url=$AAB_URL"
           echo "aab_url=$AAB_URL" >> "$GITHUB_OUTPUT"
-        env:
-          EAS_ACCESS_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Fetch latest APK build from 'production-apk'
         id: get_apk
@@ -55,13 +57,12 @@ jobs:
           BUILD=$(eas build:list --platform android --profile production-apk --limit 1 --json --non-interactive || echo "[]")
           echo "APK build list: $BUILD"
           echo "$BUILD" > build-apk.json
-          APK_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.applicationArchiveUrl')
+          APK_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.applicationArchiveUrl // empty')
           echo "apk_url=$APK_URL"
           echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
-        env:
-          EAS_ACCESS_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Download AAB & APK
+        if: steps.get_aab.outputs.aab_url != '' && steps.get_apk.outputs.apk_url != ''
         run: |
           mkdir -p dist
           curl -L "${{ steps.get_aab.outputs.aab_url }}" -o dist/app-release.aab
