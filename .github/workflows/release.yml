@@ -34,20 +34,27 @@ jobs:
       - name: Install eas-cli
         run: npm install -g eas-cli
 
-      - name: Fetch latest Android build info
-        id: get_build
+      - name: Fetch latest AAB build from 'production'
+        id: get_aab
         run: |
-          BUILD=$(eas build:list --platform android --limit 1 --json)
-          AAB_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.buildUrl')
-          APK_URL=$(echo "$BUILD" | jq -r '.[0].artifacts.applicationArchiveUrl')
-          echo "aab_url=$AAB_URL" >> "$GITHUB_OUTPUT"
-          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
+          AAB_URL=$(eas build:list --platform android --profile production --limit 1 --json | jq -r '.[0].artifacts.buildUrl')
+          echo "aab_url=$AAB_URL" >> $GITHUB_OUTPUT
+        env:
+          EAS_ACCESS_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Fetch latest APK build from 'production-apk'
+        id: get_apk
+        run: |
+          APK_URL=$(eas build:list --platform android --profile production-apk --limit 1 --json | jq -r '.[0].artifacts.applicationArchiveUrl')
+          echo "apk_url=$APK_URL" >> $GITHUB_OUTPUT
+        env:
+          EAS_ACCESS_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       - name: Download AAB & APK
         run: |
           mkdir -p dist
-          curl -L "${{ steps.get_build.outputs.aab_url }}" -o dist/app-release.aab
-          curl -L "${{ steps.get_build.outputs.apk_url }}" -o dist/app-release.apk
+          curl -L "${{ steps.get_aab.outputs.aab_url }}" -o dist/app-release.aab
+          curl -L "${{ steps.get_apk.outputs.apk_url }}" -o dist/app-release.apk
 
       - name: Generate release.json
         run: |
