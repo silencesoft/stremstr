@@ -3,7 +3,7 @@
     "name": "Stremstr",
     "slug": "stremstr",
     "owner": "silencesoft",
-    "version": "0.3.5",
+    "version": "0.3.6",
     "icon": "./assets/themes/light/icon_192_light.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
@@ -19,6 +19,7 @@
       },
       "package": "net.silencesoft.stremstr",
       "versionCode": 2,
+      "minSdkVersion": 24,
       "enableProguardInReleaseBuilds": true,
       "enableShrinkResourcesInReleaseBuilds": true,
       "config": {
