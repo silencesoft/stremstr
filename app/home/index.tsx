@@ -12,11 +12,14 @@ import {
   Alert,
   useWindowDimensions,
   Animated,
+  useColorScheme,
 } from "react-native";
-import { useRouter } from "expo-router";
+import {
+  useRouter,
+  useNavigation,
+  useFocusEffect,
+} from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation, useFocusEffect } from "expo-router";
-import { useColorScheme } from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -74,7 +77,7 @@ export default function HomeScreen() {
     setError,
   } = usePostStore();
 
-  const { hashtags, addHashtags, resetHashtags } = useHashtagStore();
+  const { hashtags, addHashtags } = useHashtagStore();
 
   const loadPosts = useCallback(
     async (loadMore = false) => {
@@ -162,7 +165,7 @@ export default function HomeScreen() {
         setLoadingMore(false);
       }
     },
-    [hashtag, since, loadingInitial, loadingMore]
+    [hashtag, since, loadingInitial, loadingMore, addHashtags, addPosts, resetPosts, setError, setLoadingInitial, setLoadingMore]
   );
 
   const handleRefresh = () => {
@@ -193,7 +196,7 @@ export default function HomeScreen() {
       navigation.setOptions({
         title: "Home",
       });
-    }, [])
+    }, [navigation])
   );
 
   useEffect(() => {
@@ -204,6 +207,7 @@ export default function HomeScreen() {
     }
 
     handleRefresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hashtag]);
 
   return (

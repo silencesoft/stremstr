@@ -18,7 +18,12 @@
         "backgroundColor": "#ffffff"
       },
       "package": "net.silencesoft.stremstr",
-      "versionCode": 2
+      "versionCode": 2,
+      "enableProguardInReleaseBuilds": true,
+      "enableShrinkResourcesInReleaseBuilds": true,
+      "config": {
+        "pageSize": "16KB"
+      }
     },
     "web": {
       "bundler": "metro",

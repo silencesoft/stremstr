@@ -7,7 +7,22 @@ const pool = new SimplePool();
 
 // Connect to relays
 export const connectToRelays = async (): Promise<void> => {
-  await useRelayStore.getState().connectAll();
+  try {
+    await useRelayStore.getState().connectAll();
+    
+    // Check if at least one relay is connected
+    const isConnected = useRelayStore.getState().isConnected();
+    if (!isConnected) {
+      console.warn("⚠️ No relays connected. The app may not function properly.");
+      throw new Error("Failed to connect to any relay. Please check your internet connection.");
+    } else {
+      const activeRelays = useRelayStore.getState().getActiveRelays();
+      console.log(`✅ Successfully connected to ${activeRelays.length} relay(s)`);
+    }
+  } catch (error) {
+    console.error("❌ Failed to connect to relays:", error);
+    throw error;
+  }
 };
 
 // Fetch user profile

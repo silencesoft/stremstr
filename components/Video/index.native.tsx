@@ -20,7 +20,7 @@ const Video = ({ videoId, playing, setPlaying }: Props) => {
         width={screenWidth}
         play={playing}
         videoId={videoId}
-        onChangeState={(state) => {
+        onChangeState={(state: string) => {
           if (state === "ended") {
             setPlaying(false);
           }

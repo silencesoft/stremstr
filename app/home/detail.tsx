@@ -14,8 +14,9 @@ import {
   useRouter,
   useLocalSearchParams,
   RelativePathString,
+  useNavigation,
+  useFocusEffect,
 } from "expo-router";
-import { useNavigation, useFocusEffect } from "expo-router";
 
 import { formatDate } from "@/utils/formatDate";
 import { usePostStore } from "@/stores/usePostStore";
@@ -57,13 +58,21 @@ const DetailScreen = () => {
     },
     hashtag: {
       color: "#1e90ff",
-      fontWeight: "700",
+      fontWeight: "700" as const,
     },
     link: {
       color: "#1e90ff",
-      textDecorationLine: "underline",
+      textDecorationLine: "underline" as const,
     },
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      navigation.setOptions({
+        title: "Home",
+      });
+    }, [navigation])
+  );
 
   if (!post) {
     return (
@@ -73,14 +82,6 @@ const DetailScreen = () => {
       </View>
     );
   }
-
-  useFocusEffect(
-    useCallback(() => {
-      navigation.setOptions({
-        title: "Home",
-      });
-    }, [])
-  );
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20 }}>
@@ -115,7 +116,23 @@ const DetailScreen = () => {
           </View>
 
           <Text style={styles.title}>{post.title}</Text>
-          <Text style={styles.date}>{formatDate(post.created_at)}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <Text style={styles.date}>{formatDate(post.created_at)}</Text>
+            {post.video && (
+              <View
+                style={[
+                  styles.videoTypeBadge,
+                  post.video.includes('youtube.com')
+                    ? styles.youtubeBadge
+                    : styles.fileBadge,
+                ]}
+              >
+                <Text style={styles.videoTypeText}>
+                  {post.video.includes('youtube.com') ? '📺 YouTube' : '🎬 Video'}
+                </Text>
+              </View>
+            )}
+          </View>
 
           <Markdown style={markdownStyles}>{visibleText}</Markdown>
           {isLong && (
@@ -211,6 +228,23 @@ const createStyles = (isDark: boolean) =>
       color: "#1e90ff",
       fontWeight: "500",
       marginBottom: 16,
+    },
+    videoTypeBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      borderRadius: 12,
+      alignSelf: 'flex-start',
+    },
+    youtubeBadge: {
+      backgroundColor: isDark ? "#FF0000" : "#FF0000",
+    },
+    fileBadge: {
+      backgroundColor: isDark ? "#4CAF50" : "#4CAF50",
+    },
+    videoTypeText: {
+      fontSize: 10,
+      fontWeight: "600",
+      color: "#fff",
     },
   });
 

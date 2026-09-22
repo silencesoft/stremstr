@@ -1,6 +1,5 @@
 import React from "react";
-import { Platform, View } from "react-native";
-import YoutubeVideo from "./index.native";
+import { View } from "react-native";
 
 type Props = {
   videoId: string;
@@ -8,7 +7,7 @@ type Props = {
   setPlaying: (playing: boolean) => void;
 };
 
-const Video = ({ videoId, playing = true, setPlaying }: Props) => {
+const Video = ({ videoId }: Props) => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <iframe

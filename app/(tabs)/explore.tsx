@@ -1,4 +1,4 @@
-import { StyleSheet, Linking } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { ExternalLink } from "@/components/ExternalLink";
 import ParallaxScrollView from "@/components/ParallaxScrollView";

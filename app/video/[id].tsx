@@ -1,10 +1,15 @@
-import { useState, useCallback, useEffect } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState, useCallback, useEffect, useRef } from "react";
+import {
+  useLocalSearchParams,
+  useRouter,
+  useNavigation,
+  useFocusEffect,
+} from "expo-router";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
-import { useVideoPlayer, VideoView } from "expo-video";
+import { useVideoPlayer, VideoView, VideoPlayer } from "expo-video";
 import { usePostStore } from "@/stores/usePostStore";
 import { useEvent } from "expo";
-import { useNavigation, useFocusEffect } from "expo-router";
+// eslint-disable-next-line import/no-unresolved
 import Video from "@/components/Video";
 
 export default function VideoScreen() {
@@ -14,33 +19,49 @@ export default function VideoScreen() {
   const navigation = useNavigation();
   const [playing, setPlaying] = useState(true);
 
-  const player = useVideoPlayer(videoSource || "", (p) => {
-    p.loop = false;
-    p.play();
-  });
-
-  const { isPlaying } = useEvent(player, "playingChange", {
-    isPlaying: player.playing,
-  });
-
   const isYoutube = videoSource?.includes("youtube.com/embed");
-
   const router = useRouter();
 
+  // Create a ref to track if player should be used
+  const shouldUseExpoVideo = !isYoutube && videoSource;
+  
+  // Always create player (but don't use it for YouTube)
+  // Use null source for YouTube to avoid loading
+  const player = useVideoPlayer(
+    shouldUseExpoVideo ? videoSource : null,
+    (p) => {
+      if (shouldUseExpoVideo) {
+        p.loop = false;
+        p.play();
+      }
+    }
+  );
+
+  // Always call useEvent but only use result for non-YouTube
+  const { isPlaying } = useEvent(player, "playingChange", {
+    isPlaying: player?.playing || false,
+  });
+
+  // Cleanup effect - only pause for non-YouTube
   useEffect(() => {
     return () => {
-      if (isPlaying) {
-        player?.pause();
+      if (shouldUseExpoVideo && isPlaying && player) {
+        try {
+          player.pause();
+        } catch (error) {
+          // Ignore errors on cleanup
+          console.log("Player cleanup error (expected):", error);
+        }
       }
     };
-  }, [player]);
+  }, [player, isPlaying, shouldUseExpoVideo]);
 
   useFocusEffect(
     useCallback(() => {
       navigation.setOptions({
         title: post?.title?.slice(0, 20) || "Video",
       });
-    }, [])
+    }, [navigation, post?.title])
   );
 
   return (
