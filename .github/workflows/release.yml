@@ -70,10 +70,12 @@ jobs:
 
       - name: Generate release.json
         run: |
+          mkdir -p dist
           echo '{ "version": "'"$VERSION"'", "aab_url": "https://github.com/${{ github.repository }}/releases/download/v'"$VERSION"'/app-release.aab", "apk_url": "https://github.com/${{ github.repository }}/releases/download/v'"$VERSION"'/app-release.apk" }' > dist/release.json
 
       - name: Generate CHANGELOG.md
         run: |
+          mkdir -p dist
           echo "## Changelog for v$VERSION" > dist/CHANGELOG.md
           echo "" >> dist/CHANGELOG.md
           git log -1 --pretty=format:"- %s (%h)" >> dist/CHANGELOG.md
