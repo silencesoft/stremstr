@@ -21,8 +21,8 @@ module.exports = ({ config }) => {
           android: {
             // Enable 16KB page size alignment in native builds
             usesCleartextTraffic: false,
-            // Ensure the app is compatible with 16KB page size
-            minSdkVersion: 21,
+            // Set minSdkVersion to 24 (required by React Native libraries)
+            minSdkVersion: 24,
             compileSdkVersion: 34,
             targetSdkVersion: 34,
             // Add JVM options for better memory alignment
