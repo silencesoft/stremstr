@@ -3,7 +3,7 @@
     "name": "Stremstr",
     "slug": "stremstr",
     "owner": "silencesoft",
-    "version": "0.3.6.4",
+    "version": "0.3.6.5",
     "icon": "./assets/themes/light/icon_192_light.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "net.silencesoft.stremstr",
-      "versionCode": 10,
+      "versionCode": 12,
       "minSdkVersion": 24,
       "compileSdkVersion": 35,
       "targetSdkVersion": 35,

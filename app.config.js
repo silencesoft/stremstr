@@ -3,6 +3,10 @@ module.exports = ({ config }) => {
     ...config,
     android: {
       ...config.android,
+      // SDK version settings - CRITICAL for Play Store
+      minSdkVersion: 24,
+      compileSdkVersion: 35,
+      targetSdkVersion: 35,
       // Enable 16KB page size support for newer Android devices
       // This is required for Android 15+ devices with 16KB page size
       config: {
