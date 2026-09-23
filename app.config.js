@@ -23,8 +23,8 @@ module.exports = ({ config }) => {
             usesCleartextTraffic: false,
             // Set minSdkVersion to 24 (required by React Native libraries)
             minSdkVersion: 24,
-            compileSdkVersion: 34,
-            targetSdkVersion: 34,
+            compileSdkVersion: 35,
+            targetSdkVersion: 35,
             // Add JVM options for better memory alignment
             packagingOptions: {
               pickFirst: ['**/libc++_shared.so'],
